@@ -1,0 +1,1 @@
+E:\mongodb\mongodb2.6.3\bin\mongod.exe -dbpath E:\mongodb\xunta
