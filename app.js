@@ -31,12 +31,10 @@ var MongoStore = require('connect-mongo')(session);
 
 app.use(session(
     {
-        key: settings.db,//cookie name
+        //key: settings.db,//cookie name
         cookie: {maxAge: 1000 * 60 * 60 * 24 * 30},//30 days
         secret: settings.cookieSecret,
-        store: new MongoStore({
-          db : settings.db,
-        })
+        url: settings.url
     }
 ));
 

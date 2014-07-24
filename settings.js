@@ -1,5 +1,6 @@
 module.exports = {
 	cookieSecret: 'xunta', 
-  	db: 'xunta', 
-  	host: 'localhost'
+	url:'mongodb://wzqwzq:wuziqi123A@kahana.mongohq.com:10036/xunta'
+  	//db: 'xunta', 
+  	//host: 'localhost'
 };

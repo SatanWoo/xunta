@@ -1,4 +1,5 @@
-var mongodb = require('./db');
+var mongodb = require('mongodb').Db;
+var setting = require('../settings.js');
 
 function User(name, email, password) {
 	this.username = name;
@@ -62,20 +63,20 @@ function findUserByEmail(email, callback) {
 }
 
 function checkUser(query, callback) {
-	mongodb.open( function(err, db) {
+	mongodb.connect(setting.url, function(err, db) {
 		if (err) {
-			mongodb.close();
+			//mongodb.close();
 			return callback(err);
 		}
 
 		db.collection('users', function(err, collections) {
 			if (err) {
-				mongodb.close();
+				db.close();
 				return callback(err);
 			}
 
 			collections.findOne(query, function (err, user){
-				mongodb.close();
+				db.close();
 				if (err) {
 					return callback(err);
 				}
@@ -87,20 +88,20 @@ function checkUser(query, callback) {
 }
 
 function saveUserToDatabase(user, callback) {
-	mongodb.open(function (err, db) {
+	mongodb.connect(setting.url, function (err, db) {
 		if (err) {
-			mongodb.close();
+			//mongodb.close();
 			return callback(err);
 		}
 
 		db.collection('users', function (err, collection) {
 			if (err) {
-				mongodb.close();
+				db.close();
 				return callback(err);
 			}
 
 			collection.insert(user, {safe:true}, function (err, user) {
-				mongodb.close();
+				db.close();
 				if (err) {
 					return callback(err);
 				}
