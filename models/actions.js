@@ -6,6 +6,8 @@ var save    = require('../helper/util.js').saveModelToDatabase,
     remove  = require('../helper/util.js').removeModelByID,
     all     = require('../helper/util.js').getListByPage;
 
+var cache   = require('./loginCache.js');
+
 function Action(content, authorName, authorID) {
 	this.content = content;
 	this.authorName = authorName;

@@ -3,6 +3,7 @@ var express = require('express'),
 var check   = require('../helper/validate').checkUserLogined;
 var Action  = require('../models/actions');
 var find    = require('../helper/util').findModelByID;
+var cache = require('../models/loginCache.js');
 
 router.get('/', function (req, res) {
 	var page = req.query['page'] || 1;
@@ -26,17 +27,29 @@ router.get('/:page', function (req, res) {
 	});
 });
 
-router.post('/create', check);
+//router.post('/create', check);
 router.post('/create', function (req, res) {
-	var content = req.body['content'],
-	    userID  = req.session.user._id,
-	    username = req.session.user.username;
+	var content = req.body['content'];
+	var token   = req.headers['token'];
 
-	Action.create(content, username, userID, function (err, action) {
+	cache.check(token, function (err, result){
 		if (err) {
-			res.send({'error':error.toString()});
+			res.send({'error':'您还未登录'});
 		} else {
-			res.send(action);
+			var uid = result;
+			find(uid, 'users', function (err, user) {
+				if (err) {
+					res.send({'error':err.toString()});
+				} else {
+					Action.create(content, user.username, user._id, function (err, action) {
+						if (err) {
+							res.send({'error':error.toString()});
+						} else {
+							res.send(action);
+						}
+					});
+				}
+			});
 		}
 	});
 });
@@ -63,23 +76,31 @@ router.get('/detail/:id', function (req, res) {
 	});
 });
 
-router.post('/delete/:id', check);
+//router.post('/delete/:id', check);
 router.post('/delete/:id', function (req, res) {
-	var actionID = req.params['id'],
-	    userID   = req.session.user._id;
-	find(actionID, 'actions', function (err, action){
+	var actionID = req.params['id'];
+	var token   = req.headers['token'];
+
+	cache.check(token, function (err, result){
 		if (err) {
-			res.send({'error':err.toString()})
-		} else if (!action) {
-			res.send({'error':'该动态已不存在'});
-		} else if (action.authorID != userID) {
-			res.send({'error':'权限不匹配，无法删除'});
+			res.send({'error':'您还未登录'});
 		} else {
-			Action.remove(actionID, function (err) {
+			var userID = result;
+			find(actionID, 'actions', function (err, action){
 				if (err) {
-					res.send({'error':error.toString()});
+					res.send({'error':err.toString()})
+				} else if (!action) {
+					res.send({'error':'该动态已不存在'});
+				} else if (action.authorID != userID) {
+					res.send({'error':'权限不匹配，无法删除'});
 				} else {
-					res.send({'success':'删除成功'});
+					Action.remove(actionID, function (err) {
+						if (err) {
+							res.send({'error':error.toString()});
+						} else {
+							res.send({'success':'删除成功'});
+						}
+					});
 				}
 			});
 		}

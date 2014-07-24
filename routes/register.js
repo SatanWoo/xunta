@@ -11,7 +11,7 @@ router.post('/', function(req, res) {
 		if (err) {
 			res.send({'error': err.toString()});
 		} else {
-			req.session.user = user;
+			//req.session.user = user;
 			res.send(user);
 		}
 	});

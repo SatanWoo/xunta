@@ -1,5 +1,6 @@
 var mongodb = require('mongodb').Db;
 var setting = require('../settings.js');
+var cache   = require('./loginCache.js');
 
 function User(name, email, password) {
 	this.username = name;
@@ -8,6 +9,7 @@ function User(name, email, password) {
 }
 
 User.login = function (username, password, callback) {
+
 	findUserByUsername(username, function (err, user){
 		if (err) {
 			return callback('服务器开小差');
@@ -17,7 +19,10 @@ User.login = function (username, password, callback) {
 			return callback('用户不存在或者密码错误');
 		}
 
-		return callback(null, user);
+		cache.login(user._id, function(err, result) {
+			if (err) return callback(err);
+			return callback(null, result);
+		});
 	});
 }
 
@@ -45,10 +50,20 @@ User.register = function (username, password, email, callback) {
 				if (err) {
 					return callback('服务器开小差');
 				}
-
-				return callback(null, user);
+				console.log(user);
+				console.log('id is: '+ user[0]._id);
+				cache.login(user[0]._id, function(err, result) {
+					if (err) return callback(err);
+					return callback(null, result);
+				});
 			});
 		});
+	});
+}
+
+User.logout = function(token, callback) {
+	cache.logout(token, function (err) {
+		callback(err);
 	});
 }
 
