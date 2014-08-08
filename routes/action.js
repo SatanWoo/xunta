@@ -31,6 +31,11 @@ router.get('/:page', function (req, res) {
 router.post('/create', function (req, res) {
 	var content = req.body['content'];
 	var token   = req.headers['token'];
+	var longtitude = req.body['longtitude'];
+	var latitude = req.body['latitude'];
+
+	if (!longtitude) longtitude = "null";
+	if (!latitude) latitude = "null";
 
 	cache.check(token, function (err, result){
 		if (err) {
@@ -41,7 +46,7 @@ router.post('/create', function (req, res) {
 				if (err) {
 					res.send({'error':err.toString()});
 				} else {
-					Action.create(content, user.username, user._id, function (err, action) {
+					Action.create(content, user.username, user._id, longtitude, latitude, function (err, action) {
 						if (err) {
 							res.send({'error':error.toString()});
 						} else {

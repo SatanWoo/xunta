@@ -8,15 +8,17 @@ var save    = require('../helper/util.js').saveModelToDatabase,
 
 var cache   = require('./loginCache.js');
 
-function Action(content, authorName, authorID) {
+function Action(content, authorName, authorID, longtitude, latitude) {
 	this.content = content;
 	this.authorName = authorName;
 	this.authorID = authorID;
+	this.longtitude = longtitude;
+	this.latitude = latitude;
 	this.date = new Date();
 }
 
 Action.list = function(page, callback) {
-	all(page, 'actions', function (err, actions) {
+	all(page, 'nactions', function (err, actions) {
 		if (err) {
 			return callback('服务器开小差');
 		}
@@ -25,9 +27,9 @@ Action.list = function(page, callback) {
 	});
 }
 
-Action.create = function(content, authorName, authorID, callback) {
-	var newAction = new Action(content, authorName, authorID);
-	save(newAction, 'actions', function (err, action){
+Action.create = function(content, authorName, authorID, longtitude, latitude, callback) {
+	var newAction = new Action(content, authorName, authorID, longtitude, latitude);
+	save(newAction, 'nactions', function (err, action){
 		if (err) {
 			return callback('服务器开小差');
 		}
@@ -37,7 +39,7 @@ Action.create = function(content, authorName, authorID, callback) {
 }
 
 Action.detail = function(actionID, callback) {
-	find(actionID, 'actions', function (err, action) {
+	find(actionID, 'nactions', function (err, action) {
 		if (err) {
 			return callback('服务器开小差');
 		}
@@ -51,7 +53,7 @@ Action.detail = function(actionID, callback) {
 }
 
 Action.remove = function(actionID, callback) {
-	remove(actionID, 'actions', function (err) {
+	remove(actionID, 'nactions', function (err) {
 		if (err) {
 			return callback(err);
 		}
