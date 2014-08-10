@@ -5,7 +5,7 @@ var random = require('crypto').randomBytes;
 var pool = poolModule.Pool({
 	name : 'token',
 	create: function(callback) {
-		var client = redis.createClient('10197', 'grouper.redistogo.com', {auth_pass:'5bd16fd746d745f8aa492f1c784fd923'});
+		var client = redis.createClient('9916', 'hoki.redistogo.com', {auth_pass:'ec8749264b11ea62df5b0d416ba788a9'});
 		callback(null, client);
 	},
 
