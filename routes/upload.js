@@ -34,7 +34,7 @@ function uptoken(bucketname) {
 function uploadFile(localFile, key, uptoken) {
   var extra = new qiniu.io.PutExtra();
 
-  qiniu.io.putFile(uptoken, key, localFile, extra, function(err, ret) {
+  qiniu.io.put(uptoken, key, localFile, extra, function(err, ret) {
     if(!err) {
       // 上传成功， 处理返回值
       console.log(ret.key, ret.hash);
@@ -51,25 +51,33 @@ function uploadFile(localFile, key, uptoken) {
 
 router.post('/', function (req, res) {
 	var form = new multiparty.Form();
-	// var data = [];
+	var datas = [];
 	var key = uuid.v4() + ".jpg";
 
 	form.on('part', function (part) {
-		//data.push(part);
-		part.resume();
+
+		if (!part.filename) {
+			part.resume();
+		} else {
+			part.on('data', function (data) {
+				datas.push(data)
+			});
+
+			part.resume();
+		}
 	});
 
 	form.on('file', function (name, file) {
-		console.log('file is ' + file.path);
-		uploadFile(file.path, key, uptoken(bucket));
+	
 	});
 
 	form.on('close', function () {
-		//var buffer = Buffer.concat(data);
+		var buffer = Buffer.concat(datas);
 		//console.log(buffer);
-
-		//
-		res.send(key);
+		
+		uploadFile(buffer, key, uptoken(bucket));
+		console.log('close');
+		res.send({'key': key});
 	});
 
 	form.parse(req);
